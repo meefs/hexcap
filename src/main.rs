@@ -15,6 +15,7 @@ mod packet;
 mod process;
 mod tcp_analysis;
 mod theme;
+mod traceroute;
 mod ui;
 
 use std::io;

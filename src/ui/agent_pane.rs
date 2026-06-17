@@ -35,8 +35,8 @@ fn draw_chat_pane(frame: &mut Frame, app: &App, theme: &Theme, area: Rect) {
     let chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints([
-            Constraint::Min(3),                      // chat messages
-            Constraint::Length(input_height),         // input bar
+            Constraint::Min(3),               // chat messages
+            Constraint::Length(input_height), // input bar
         ])
         .split(area);
 
@@ -59,9 +59,7 @@ fn draw_chat_pane(frame: &mut Frame, app: &App, theme: &Theme, area: Rect) {
                     .add_modifier(Modifier::ITALIC),
             ),
             _ => (
-                Style::default()
-                    .fg(theme.tag)
-                    .add_modifier(Modifier::BOLD),
+                Style::default().fg(theme.tag).add_modifier(Modifier::BOLD),
                 Style::default().fg(theme.fg),
             ),
         };

@@ -9,12 +9,12 @@ use crate::expert::ExpertItem;
 /// Link-layer type determining how to parse packet headers.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum LinkType {
-    /// Standard Ethernet (14-byte header) — DLT_EN10MB (1).
+    /// Standard Ethernet (14-byte header) — `DLT_EN10MB` (1).
     #[default]
     Ethernet,
-    /// BSD loopback (4-byte AF family header) — DLT_NULL (0).
+    /// BSD loopback (4-byte AF family header) — `DLT_NULL` (0).
     Null,
-    /// Raw IP (no link-layer header) — DLT_RAW (12 on macOS, 228 on Linux).
+    /// Raw IP (no link-layer header) — `DLT_RAW` (12 on macOS, 228 on Linux).
     RawIp,
 }
 
@@ -24,9 +24,8 @@ impl LinkType {
     pub fn from_dlt(dlt: u32) -> Self {
         match dlt {
             0 => Self::Null,
-            1 => Self::Ethernet,
             12 | 14 | 101 | 228 => Self::RawIp,
-            _ => Self::Ethernet, // fallback
+            _ => Self::Ethernet, // fallback (includes DLT_EN10MB=1)
         }
     }
 
@@ -150,6 +149,7 @@ pub fn parse_packet(id: u64, data: &[u8]) -> CapturedPacket {
     parse_packet_with_link(id, data, LinkType::Ethernet)
 }
 
+#[allow(clippy::too_many_lines)]
 pub fn parse_packet_with_link(id: u64, data: &[u8], link_type: LinkType) -> CapturedPacket {
     let timestamp = SystemTime::now();
     let length = data.len();
@@ -176,9 +176,8 @@ pub fn parse_packet_with_link(id: u64, data: &[u8], link_type: LinkType) -> Capt
             // BSD loopback: 4-byte AF family in host byte order.
             let af = u32::from_ne_bytes([data[0], data[1], data[2], data[3]]);
             match af {
-                2 => parse_ipv4_at(id, timestamp, data, length, hdr_len),   // AF_INET
-                30 => parse_ipv6_at(id, timestamp, data, length, hdr_len),  // AF_INET6 (macOS)
-                10 | 24 => parse_ipv6_at(id, timestamp, data, length, hdr_len), // AF_INET6 (Linux/BSDs)
+                2 => parse_ipv4_at(id, timestamp, data, length, hdr_len), // AF_INET
+                30 | 10 | 24 => parse_ipv6_at(id, timestamp, data, length, hdr_len), // AF_INET6
                 _ => CapturedPacket {
                     id,
                     timestamp,
@@ -268,7 +267,13 @@ pub fn parse_packet_with_link(id: u64, data: &[u8], link_type: LinkType) -> Capt
     }
 }
 
-fn parse_ipv4_at(id: u64, timestamp: SystemTime, data: &[u8], length: usize, ip_offset: usize) -> CapturedPacket {
+fn parse_ipv4_at(
+    id: u64,
+    timestamp: SystemTime,
+    data: &[u8],
+    length: usize,
+    ip_offset: usize,
+) -> CapturedPacket {
     if data.len() < ip_offset + 20 {
         return CapturedPacket {
             id,
@@ -359,7 +364,13 @@ fn parse_ports(ip: &[u8], ihl: usize) -> (u16, u16) {
     (sp, dp)
 }
 
-fn parse_ipv6_at(id: u64, timestamp: SystemTime, data: &[u8], length: usize, ip_offset: usize) -> CapturedPacket {
+fn parse_ipv6_at(
+    id: u64,
+    timestamp: SystemTime,
+    data: &[u8],
+    length: usize,
+    ip_offset: usize,
+) -> CapturedPacket {
     if data.len() < ip_offset + 40 {
         return CapturedPacket {
             id,

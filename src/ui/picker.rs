@@ -191,10 +191,7 @@ pub fn draw_agent_picker(frame: &mut Frame, app: &App, theme: &Theme) {
                     format!(" {:<12}", preset.name),
                     Style::default().fg(theme.fg).add_modifier(Modifier::BOLD),
                 ),
-                Span::styled(
-                    format!("[{mode_tag}] "),
-                    Style::default().fg(theme.accent),
-                ),
+                Span::styled(format!("[{mode_tag}] "), Style::default().fg(theme.accent)),
                 Span::styled(preset.description, Style::default().fg(theme.muted)),
             ]))
         })

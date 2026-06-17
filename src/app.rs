@@ -212,6 +212,12 @@ pub struct App {
     /// Selected packet index within the flow graph overlay.
     pub flow_graph_selected: usize,
 
+    // -- Traceroute --
+    pub traceroute_state: Option<crate::traceroute::TracerouteState>,
+    pub traceroute_input: String,
+    pub traceroute_input_active: bool,
+    pub pending_traceroute_spawn: Option<String>,
+
     // -- Time display --
     pub time_format: TimeFormat,
     /// Packet ID set as time reference (t=0 point).
@@ -393,6 +399,10 @@ impl App {
             show_proto_hierarchy: false,
             show_flow_graph: false,
             flow_graph_selected: 0,
+            traceroute_state: None,
+            traceroute_input: String::new(),
+            traceroute_input_active: false,
+            pending_traceroute_spawn: None,
             time_format: TimeFormat::Absolute,
             time_reference: None,
             show_agent_pane: false,
@@ -572,6 +582,32 @@ impl App {
     pub fn cancel_goto(&mut self) {
         self.input_mode = InputMode::Normal;
         self.goto_buf.clear();
+    }
+
+    // -- Traceroute Controls --------------------------------------------------
+
+    pub fn start_traceroute_input(&mut self, default_target: Option<String>) {
+        self.traceroute_input_active = true;
+        self.traceroute_input = default_target.unwrap_or_default();
+    }
+
+    pub fn cancel_traceroute_input(&mut self) {
+        self.traceroute_input_active = false;
+        self.traceroute_input.clear();
+    }
+
+    pub fn confirm_traceroute_input(&mut self) {
+        self.traceroute_input_active = false;
+        let target = self.traceroute_input.trim().to_string();
+        self.traceroute_input.clear();
+        if !target.is_empty() {
+            self.traceroute_state = Some(crate::traceroute::TracerouteState::new(target.clone()));
+            self.pending_traceroute_spawn = Some(target);
+        }
+    }
+
+    pub fn close_traceroute(&mut self) {
+        self.traceroute_state = None;
     }
 
     pub fn search_push(&mut self, ch: char) {

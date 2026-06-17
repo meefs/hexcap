@@ -53,9 +53,9 @@ use serde::{Deserialize, Serialize};
 pub enum SpawnMode {
     /// Chat-only: no external process. Agent pane shows chat for socket IPC.
     Chat,
-    /// Open in a Ghostty split pane (AppleScript).
+    /// Open in a Ghostty split pane (`AppleScript`).
     Ghostty,
-    /// Auto-detect: Ghostty AppleScript if on Ghostty, else tmux split.
+    /// Auto-detect: Ghostty `AppleScript` if on Ghostty, else tmux split.
     Split,
 }
 
@@ -100,7 +100,7 @@ pub const AGENT_PRESETS: &[AgentPreset] = &[
              To read user messages from hexcap, run: cat {inbox} or tail -f {inbox}. \
              Respond via: echo '@@HEXCAP:{\"action\":\"chat\",\"message\":\"your reply\"}' | socat - UNIX-CONNECT:{socket}. \
              Keep this session alive for ongoing chat. \
-             You can query hexcap for packets, flows, stats, and streams at any time."
+             You can query hexcap for packets, flows, stats, and streams at any time.",
         ),
     },
     AgentPreset {
@@ -174,7 +174,11 @@ pub fn open_split(agent_bin: &str, socket_path: &str) -> Result<bool> {
 ///
 /// Returns `Ok(Some(pane_id))` with the tmux pane ID on success,
 /// `Ok(None)` if tmux is not available.
-pub fn open_tmux_split(agent_bin: &str, socket_path: &str, prompt: Option<&str>) -> Result<Option<String>> {
+pub fn open_tmux_split(
+    agent_bin: &str,
+    socket_path: &str,
+    prompt: Option<&str>,
+) -> Result<Option<String>> {
     if !is_tmux() {
         return Ok(None);
     }
@@ -206,7 +210,18 @@ pub fn open_tmux_split(agent_bin: &str, socket_path: &str, prompt: Option<&str>)
     };
     // -P -F prints the new pane ID so we can send-keys to it later.
     match Command::new("tmux")
-        .args(["split-window", "-h", "-l", "33%", "-P", "-F", "#{pane_id}", "sh", "-c", &wrapped])
+        .args([
+            "split-window",
+            "-h",
+            "-l",
+            "33%",
+            "-P",
+            "-F",
+            "#{pane_id}",
+            "sh",
+            "-c",
+            &wrapped,
+        ])
         .output()
     {
         Ok(output) if output.status.success() => {
@@ -237,11 +252,15 @@ pub fn is_tmux() -> bool {
         .is_ok_and(|s| s.success())
 }
 
-/// Open an agent in a Ghostty split pane (right side) via AppleScript.
+/// Open an agent in a Ghostty split pane (right side) via `AppleScript`.
 ///
 /// Uses `/bin/zsh -l -c` so the agent gets the user's PATH.
 /// Returns `Ok(true)` if Ghostty is detected and the split was opened.
-pub fn open_ghostty_split(agent_bin: &str, socket_path: &str, prompt: Option<&str>) -> Result<bool> {
+pub fn open_ghostty_split(
+    agent_bin: &str,
+    socket_path: &str,
+    prompt: Option<&str>,
+) -> Result<bool> {
     if !crate::ui::helpers::is_ghostty() {
         return Ok(false);
     }
@@ -643,7 +662,7 @@ impl AgentPipe {
     /// The agent runs inside a pseudo-terminal, receiving its initial prompt
     /// via the command string. The PTY keeps the agent alive and interactive.
     /// Output is read from the PTY master and displayed in the agent pane.
-    #[allow(dead_code)]
+    #[allow(dead_code, clippy::too_many_lines, clippy::similar_names)]
     pub fn spawn_pty(
         cmd: &str,
         output: AgentOutput,
@@ -678,10 +697,10 @@ impl AgentPipe {
 
         // Resolve the real user's uid/gid from SUDO_UID/SUDO_GID so the agent
         // runs as the invoking user, not root.
-        let sudo_uid = std::env::var("SUDO_UID")
+        let host_uid = std::env::var("SUDO_UID")
             .ok()
             .and_then(|v| v.parse::<libc::uid_t>().ok());
-        let sudo_gid = std::env::var("SUDO_GID")
+        let host_gid = std::env::var("SUDO_GID")
             .ok()
             .and_then(|v| v.parse::<libc::gid_t>().ok());
         let sudo_user = std::env::var("SUDO_USER").ok();
@@ -733,10 +752,10 @@ impl AgentPipe {
                 .pre_exec(move || {
                     libc::setsid();
                     // Drop privileges to the real user if running under sudo.
-                    if let Some(gid) = sudo_gid {
+                    if let Some(gid) = host_gid {
                         libc::setgid(gid);
                     }
-                    if let Some(uid) = sudo_uid {
+                    if let Some(uid) = host_uid {
                         libc::setuid(uid);
                     }
                     // Set controlling terminal.

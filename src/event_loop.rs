@@ -373,6 +373,17 @@ pub fn run_loop(
             }
         }
 
+        // Check for pending traceroute spawn.
+        let pending_tr = {
+            let mut a = app.lock().expect("app mutex poisoned");
+            a.pending_traceroute_spawn.take()
+        };
+        if let Some(target) = pending_tr {
+            let app_clone = Arc::clone(app);
+            let db_clone = geoip_db.cloned();
+            crate::traceroute::run_traceroute(target, app_clone, db_clone);
+        }
+
         // Check for pending agent picker selection -> spawn agent.
         {
             let mut a = app.lock().expect("app mutex poisoned");
@@ -420,22 +431,14 @@ pub fn run_loop(
                             a.agent_scroll = 0;
                             a.chat_messages.push(crate::app::ChatMessage {
                                 sender: "system".into(),
-                                text: format!(
-                                    "{} chat ready. Socket: {sock_path}",
-                                    preset.name
-                                ),
+                                text: format!("{} chat ready. Socket: {sock_path}", preset.name),
                             });
                             let _ = crate::clipboard::copy_to_clipboard(&sock_path);
-                            a.set_status(format!(
-                                "{} chat (socket: {sock_path})",
-                                preset.name
-                            ));
+                            a.set_status(format!("{} chat (socket: {sock_path})", preset.name));
                         }
                         agent::SpawnMode::Ghostty | agent::SpawnMode::Split => {
                             // Split mode: open agent in a terminal split pane.
-                            let Some(agent_bin) =
-                                agent::resolve_binary(preset.binary)
-                            else {
+                            let Some(agent_bin) = agent::resolve_binary(preset.binary) else {
                                 a.set_status(format!(
                                     "{} not found — install {} first",
                                     preset.binary, preset.name
@@ -445,21 +448,37 @@ pub fn run_loop(
                             let use_ghostty = match preset.spawn_mode {
                                 agent::SpawnMode::Ghostty => true,
                                 agent::SpawnMode::Split => {
-                                    if agent::is_tmux() { false } else { crate::ui::helpers::is_ghostty() }
+                                    if agent::is_tmux() {
+                                        false
+                                    } else {
+                                        crate::ui::helpers::is_ghostty()
+                                    }
                                 }
-                                _ => false,
+                                agent::SpawnMode::Chat => false,
                             };
                             let mode_name = if use_ghostty { "Ghostty" } else { "tmux" };
                             // Unify result: Ok(true) = opened, Ok(false) = not available.
                             let split_ok = if use_ghostty {
-                                match agent::open_ghostty_split(&agent_bin, &sock_path, preset.initial_prompt) {
+                                match agent::open_ghostty_split(
+                                    &agent_bin,
+                                    &sock_path,
+                                    preset.initial_prompt,
+                                ) {
                                     Ok(opened) => {
-                                        if opened { Ok(true) } else { Ok(false) }
+                                        if opened {
+                                            Ok(true)
+                                        } else {
+                                            Ok(false)
+                                        }
                                     }
                                     Err(e) => Err(e),
                                 }
                             } else {
-                                match agent::open_tmux_split(&agent_bin, &sock_path, preset.initial_prompt) {
+                                match agent::open_tmux_split(
+                                    &agent_bin,
+                                    &sock_path,
+                                    preset.initial_prompt,
+                                ) {
                                     Ok(Some(pane_id)) => {
                                         a.agent_tmux_pane = Some(pane_id);
                                         Ok(true)

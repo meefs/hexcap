@@ -1,3 +1,5 @@
+use std::fmt::Write;
+
 use crossterm::event::{KeyCode, MouseEvent, MouseEventKind};
 
 use crate::app::{App, InputMode, View};
@@ -87,6 +89,53 @@ pub fn handle_key(app: &mut App, code: KeyCode) -> bool {
         return false;
     }
 
+    // Traceroute input box — intercept keys.
+    if app.traceroute_input_active {
+        match code {
+            KeyCode::Esc => app.cancel_traceroute_input(),
+            KeyCode::Enter => app.confirm_traceroute_input(),
+            KeyCode::Backspace => {
+                app.traceroute_input.pop();
+            }
+            KeyCode::Char(ch) => {
+                app.traceroute_input.push(ch);
+            }
+            _ => {}
+        }
+        return false;
+    }
+
+    // Traceroute Overlay — intercept keys.
+    if app.traceroute_state.is_some() {
+        match code {
+            KeyCode::Esc | KeyCode::Char('q') => app.close_traceroute(),
+            KeyCode::Char('y') => {
+                if let Some(ref state) = app.traceroute_state {
+                    let mut dump = format!("Traceroute to {}\n", state.target);
+                    for h in &state.hops {
+                        let name = h.hostname.as_deref().unwrap_or("*");
+                        let geo = h
+                            .geoip
+                            .as_ref()
+                            .map(|g| format!(" [{g}]"))
+                            .unwrap_or_default();
+                        let rtt = h
+                            .rtt
+                            .map_or_else(|| " *".to_string(), |r| format!(" {r:.3} ms"));
+                        let _ = writeln!(dump, "  {}  {} ({}){}  {}", h.hop, name, h.ip, geo, rtt);
+                    }
+                    let msg = match clipboard::copy_to_clipboard(&dump) {
+                        Ok(()) => "Traceroute copied".to_string(),
+                        Err(e) => format!("Copy failed: {e}"),
+                    };
+                    app.set_status(msg);
+                }
+            }
+            _ => {}
+        }
+        return false;
+    }
+
     // Agent picker overlay — intercept keys first.
     if app.agent_picker.is_some() {
         match code {
@@ -116,7 +165,6 @@ pub fn handle_key(app: &mut App, code: KeyCode) -> bool {
                 app.chat_input.clear();
                 app.agent_scroll = 0; // auto-scroll to bottom
             }
-            KeyCode::Enter => {}
             KeyCode::Backspace => {
                 app.chat_input.pop();
             }
@@ -331,6 +379,13 @@ fn handle_list_key(app: &mut App, code: KeyCode) -> bool {
         KeyCode::Char('H') => app.show_proto_hierarchy = true,
         KeyCode::Char('x') => app.mark_or_diff(),
         KeyCode::Char('a') => app.start_annotate(),
+        KeyCode::Char('r') => {
+            let default_target = app.selected_packet().and_then(|pkt| {
+                let ip = crate::dns::extract_ip(&pkt.dst)?;
+                Some(ip.to_string())
+            });
+            app.start_traceroute_input(default_target);
+        }
         KeyCode::Char('\\') => app.start_display_filter(),
         KeyCode::Char('T') => app.cycle_time_format(),
         KeyCode::Char('R') => app.toggle_time_reference(),
@@ -408,9 +463,7 @@ fn handle_detail_key(app: &mut App, code: KeyCode) {
                 app.set_status("No agent connected — press A to open one".into());
             } else if let Some(pkt) = app.selected_packet().cloned() {
                 let json = serde_json::to_string_pretty(&pkt).unwrap_or_default();
-                let prompt = format!(
-                    "Explain this packet in detail:\n```json\n{json}\n```"
-                );
+                let prompt = format!("Explain this packet in detail:\n```json\n{json}\n```");
                 app.chat_messages.push(crate::app::ChatMessage {
                     sender: "you".into(),
                     text: prompt.clone(),
@@ -422,6 +475,13 @@ fn handle_detail_key(app: &mut App, code: KeyCode) {
             } else {
                 app.set_status("No packet selected".into());
             }
+        }
+        KeyCode::Char('r') => {
+            let default_target = app.selected_packet().and_then(|pkt| {
+                let ip = crate::dns::extract_ip(&pkt.dst)?;
+                Some(ip.to_string())
+            });
+            app.start_traceroute_input(default_target);
         }
         KeyCode::Char('A') => {
             if app.agent_name.is_some() {

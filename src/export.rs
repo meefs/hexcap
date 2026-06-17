@@ -25,7 +25,11 @@ pub fn write_pcap(path: &Path, packets: &[&CapturedPacket]) -> Result<usize> {
 }
 
 /// Write captured packets to a pcap file with a specific link type.
-pub fn write_pcap_with_link(path: &Path, packets: &[&CapturedPacket], link_type: LinkType) -> Result<usize> {
+pub fn write_pcap_with_link(
+    path: &Path,
+    packets: &[&CapturedPacket],
+    link_type: LinkType,
+) -> Result<usize> {
     let mut file =
         File::create(path).with_context(|| format!("failed to create {}", path.display()))?;
 

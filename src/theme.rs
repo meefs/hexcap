@@ -131,26 +131,26 @@ const FLOW_POSTRBOARD_DARK: [Color; 8] = [
 
 /// Default light: crisp cool tones (cyan accent family)
 const FLOW_DEFAULT_LIGHT: [Color; 8] = [
-    Color::Rgb(0, 120, 170),   // ocean blue (accent family)
-    Color::Rgb(190, 30, 45),   // cherry red
-    Color::Rgb(10, 135, 55),   // emerald
-    Color::Rgb(195, 105, 0),   // tangerine
-    Color::Rgb(115, 55, 190),  // iris
-    Color::Rgb(0, 138, 125),   // jade
-    Color::Rgb(175, 40, 120),  // fuchsia
-    Color::Rgb(95, 115, 15),   // chartreuse
+    Color::Rgb(0, 120, 170),  // ocean blue (accent family)
+    Color::Rgb(190, 30, 45),  // cherry red
+    Color::Rgb(10, 135, 55),  // emerald
+    Color::Rgb(195, 105, 0),  // tangerine
+    Color::Rgb(115, 55, 190), // iris
+    Color::Rgb(0, 138, 125),  // jade
+    Color::Rgb(175, 40, 120), // fuchsia
+    Color::Rgb(95, 115, 15),  // chartreuse
 ];
 
 /// Gruvbox light: gruvbox dark accents on cream
 const FLOW_GRUVBOX_LIGHT: [Color; 8] = [
-    Color::Rgb(175, 58, 3),    // orange (gruvbox orange)
-    Color::Rgb(157, 0, 6),     // red (gruvbox red)
-    Color::Rgb(121, 116, 14),  // green (gruvbox green)
-    Color::Rgb(181, 118, 20),  // yellow-brown (gruvbox yellow)
-    Color::Rgb(143, 63, 113),  // purple (gruvbox purple)
-    Color::Rgb(69, 133, 136),  // aqua (gruvbox aqua)
-    Color::Rgb(7, 102, 120),   // blue-teal (gruvbox blue)
-    Color::Rgb(130, 100, 10),  // olive
+    Color::Rgb(175, 58, 3),   // orange (gruvbox orange)
+    Color::Rgb(157, 0, 6),    // red (gruvbox red)
+    Color::Rgb(121, 116, 14), // green (gruvbox green)
+    Color::Rgb(181, 118, 20), // yellow-brown (gruvbox yellow)
+    Color::Rgb(143, 63, 113), // purple (gruvbox purple)
+    Color::Rgb(69, 133, 136), // aqua (gruvbox aqua)
+    Color::Rgb(7, 102, 120),  // blue-teal (gruvbox blue)
+    Color::Rgb(130, 100, 10), // olive
 ];
 
 /// Solarized light: solarized accent palette (same hues, works on cream)
@@ -167,14 +167,14 @@ const FLOW_SOLARIZED_LIGHT: [Color; 8] = [
 
 /// Flexoki light: flexoki ink colors on paper
 const FLOW_FLEXOKI_LIGHT: [Color; 8] = [
-    Color::Rgb(173, 131, 1),   // yellow (flexoki yellow)
-    Color::Rgb(175, 48, 51),   // red (flexoki red)
-    Color::Rgb(76, 128, 46),   // green (flexoki green)
-    Color::Rgb(36, 131, 123),  // cyan (flexoki cyan)
-    Color::Rgb(100, 92, 187),  // purple (flexoki purple)
-    Color::Rgb(188, 93, 11),   // orange (flexoki orange)
-    Color::Rgb(165, 55, 120),  // magenta (flexoki magenta)
-    Color::Rgb(32, 90, 165),   // blue (flexoki blue)
+    Color::Rgb(173, 131, 1),  // yellow (flexoki yellow)
+    Color::Rgb(175, 48, 51),  // red (flexoki red)
+    Color::Rgb(76, 128, 46),  // green (flexoki green)
+    Color::Rgb(36, 131, 123), // cyan (flexoki cyan)
+    Color::Rgb(100, 92, 187), // purple (flexoki purple)
+    Color::Rgb(188, 93, 11),  // orange (flexoki orange)
+    Color::Rgb(165, 55, 120), // magenta (flexoki magenta)
+    Color::Rgb(32, 90, 165),  // blue (flexoki blue)
 ];
 
 /// Ayu light: warm accents on white
@@ -191,38 +191,38 @@ const FLOW_AYU_LIGHT: [Color; 8] = [
 
 /// Zoegi light: muted earth tones on white
 const FLOW_ZOEGI_LIGHT: [Color; 8] = [
-    Color::Rgb(40, 100, 75),   // deep green (zoegi accent family)
-    Color::Rgb(150, 50, 50),   // muted red
-    Color::Rgb(60, 95, 140),   // steel blue (zoegi tag family)
-    Color::Rgb(150, 120, 30),  // dark gold
-    Color::Rgb(100, 80, 140),  // muted purple
-    Color::Rgb(0, 110, 110),   // dark teal
-    Color::Rgb(140, 80, 60),   // sienna
-    Color::Rgb(80, 110, 40),   // olive
+    Color::Rgb(40, 100, 75),  // deep green (zoegi accent family)
+    Color::Rgb(150, 50, 50),  // muted red
+    Color::Rgb(60, 95, 140),  // steel blue (zoegi tag family)
+    Color::Rgb(150, 120, 30), // dark gold
+    Color::Rgb(100, 80, 140), // muted purple
+    Color::Rgb(0, 110, 110),  // dark teal
+    Color::Rgb(140, 80, 60),  // sienna
+    Color::Rgb(80, 110, 40),  // olive
 ];
 
 /// FFE light: nord-inspired deeper tones
 const FLOW_FFE_LIGHT: [Color; 8] = [
-    Color::Rgb(20, 120, 100),  // deep teal (ffe accent family)
-    Color::Rgb(180, 80, 50),   // deep salmon (ffe highlight family)
-    Color::Rgb(80, 140, 70),   // forest green
-    Color::Rgb(30, 110, 140),  // deep blue (ffe tag family)
-    Color::Rgb(130, 80, 130),  // plum
-    Color::Rgb(150, 120, 30),  // dark gold
-    Color::Rgb(120, 70, 150),  // purple
-    Color::Rgb(0, 120, 120),   // dark cyan
+    Color::Rgb(20, 120, 100), // deep teal (ffe accent family)
+    Color::Rgb(180, 80, 50),  // deep salmon (ffe highlight family)
+    Color::Rgb(80, 140, 70),  // forest green
+    Color::Rgb(30, 110, 140), // deep blue (ffe tag family)
+    Color::Rgb(130, 80, 130), // plum
+    Color::Rgb(150, 120, 30), // dark gold
+    Color::Rgb(120, 70, 150), // purple
+    Color::Rgb(0, 120, 120),  // dark cyan
 ];
 
 /// Postrboard light: vivid modern on white
 const FLOW_POSTRBOARD_LIGHT: [Color; 8] = [
-    Color::Rgb(2, 110, 170),   // blue (postrboard accent family)
-    Color::Rgb(194, 65, 12),   // burnt orange (postrboard highlight)
-    Color::Rgb(22, 128, 61),   // green
-    Color::Rgb(12, 74, 110),   // navy (postrboard tag)
-    Color::Rgb(168, 50, 130),  // magenta
-    Color::Rgb(161, 130, 0),   // gold
-    Color::Rgb(109, 60, 170),  // purple
-    Color::Rgb(0, 140, 130),   // teal
+    Color::Rgb(2, 110, 170),  // blue (postrboard accent family)
+    Color::Rgb(194, 65, 12),  // burnt orange (postrboard highlight)
+    Color::Rgb(22, 128, 61),  // green
+    Color::Rgb(12, 74, 110),  // navy (postrboard tag)
+    Color::Rgb(168, 50, 130), // magenta
+    Color::Rgb(161, 130, 0),  // gold
+    Color::Rgb(109, 60, 170), // purple
+    Color::Rgb(0, 140, 130),  // teal
 ];
 
 pub const THEMES: &[Theme] = &[

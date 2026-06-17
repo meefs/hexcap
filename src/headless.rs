@@ -188,7 +188,7 @@ pub fn cmd_capture(
         .timeout(100)
         .open()?;
 
-    let link_type = packet::LinkType::from_dlt(cap.get_datalink().0 as u32);
+    let link_type = packet::LinkType::from_dlt(cap.get_datalink().0.cast_unsigned());
 
     if let Some(f) = bpf_filter {
         cap.filter(f, true)?;

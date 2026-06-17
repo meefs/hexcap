@@ -13,6 +13,7 @@ mod picker;
 mod proto_hierarchy;
 mod stats;
 mod stats_summary;
+mod traceroute;
 
 use ratatui::prelude::*;
 use ratatui::widgets::{Block, Clear};
@@ -89,6 +90,11 @@ pub fn render(frame: &mut Frame, app: &App) {
         stats_summary::draw_stats_summary(frame, app, theme);
     }
 
+    // Overlay: traceroute results.
+    if app.traceroute_state.is_some() {
+        traceroute::draw_traceroute(frame, app, theme);
+    }
+
     // Overlay: packet diff.
     if app.diff_pair.is_some() {
         diff::draw_diff(frame, app, theme);
@@ -118,7 +124,8 @@ fn draw_list_layout(frame: &mut Frame, app: &App, area: Rect) {
         app.input_mode == InputMode::Search
             || app.input_mode == InputMode::GoToPacket
             || app.annotating.is_some()
-            || app.display_filter_editing,
+            || app.display_filter_editing
+            || app.traceroute_input_active,
     );
 
     let chunks = Layout::default()
@@ -143,6 +150,9 @@ fn draw_list_layout(frame: &mut Frame, app: &App, area: Rect) {
         }
         InputMode::Normal if app.display_filter_editing => {
             list::draw_display_filter_bar(frame, app, theme, chunks[3]);
+        }
+        InputMode::Normal if app.traceroute_input_active => {
+            list::draw_traceroute_bar(frame, app, theme, chunks[3]);
         }
         InputMode::Normal => {}
     }

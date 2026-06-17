@@ -114,7 +114,7 @@ impl CaptureHandle {
             .context("failed to activate capture")?;
 
         // Detect link-layer type for correct packet parsing.
-        let link_type = LinkType::from_dlt(cap.get_datalink().0 as u32);
+        let link_type = LinkType::from_dlt(cap.get_datalink().0.cast_unsigned());
 
         if let Some(f) = filter {
             cap.filter(f, true)
